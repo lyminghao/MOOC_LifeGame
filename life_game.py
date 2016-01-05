@@ -30,7 +30,9 @@ class LifeGame(object):
         for row in range(self.game_map.rows):
             for col in range(self.game_map.cols):
                 nc = nc_map[row][col]
-                if nc < 2 or nc > 3:
+                if self.game_map.cells[row][col] == -1:
+                    continue
+                elif nc < 2 or nc > 3:
                     self.game_map.set(row, col, 0)
                 elif nc == 3:
                     self.game_map.set(row, col, 1)

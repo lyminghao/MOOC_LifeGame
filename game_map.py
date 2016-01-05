@@ -23,13 +23,13 @@ class GameMap(object):
     MIN_CELL_VALUE = -1
     DIRECTIONS = (
         (0, 1, ),
-        (0, -1, ),
+        (0, 2, ),
         (1, 0, ),
+        (2, 0, ),
+        (0, -1, ),
+        (0, -2, ),
         (-1, 0, ),
-        (1, 1, ),
-        (1, -1, ),
-        (-1, 1, ),
-        (-1, -1, ),
+        (-2, 0, ),
     )
 
     def __init__(self, rows, cols):
@@ -58,13 +58,13 @@ class GameMap(object):
         """
         for row in self.cells:
             for col_num in range(self.cols):
-                if random.random() < possibility_wall:
+                rand_num = random.random()
+                if rand_num < possibility_live:
+                    row[col_num] = 1
+                elif rand_num < possibility_live + possibility_wall:
                     row[col_num] = -1
                 else:
-                    if random.random() < possibility_live:
-                        row[col_num] = 1
-                    else:
-                        row[col_num] = 0
+                    row[col_num] = 0
 
     def set(self, row, col, val):
         """Set specific cell in the map."""
@@ -84,13 +84,10 @@ class GameMap(object):
         """
         count = 0
         for d in self.DIRECTIONS:
-            d_row = row + d[0]
-            d_col = col + d[1]
-            if d_row >= self.rows:
-                d_row -= self.rows
-            if d_col >= self.cols:
-                d_col -= self.cols
-            count += self.cells[d_row][d_col]
+            d_row = (row + d[0]) % self.rows
+            d_col = (col + d[1]) % self.cols
+
+            count += int(self.cells[d_row][d_col] == 1)
         return count
 
     def get_neighbor_count_map(self):
