@@ -20,14 +20,15 @@ class GameMap(object):
     
     MAX_MAP_SIZE = 100
     MAX_CELL_VALUE = 1
-    MIN_CELL_VALUE = 0
+    MIN_CELL_VALUE = -1
     DIRECTIONS = (
         (0, 1, ),
-        (1, -1, ),
+        (0, -1, ),
+        (1, 0, ),
         (-1, 0, ),
+        (1, 1, ),
         (1, -1, ),
-        (-1, -1, ),
-        (-1, 0, ),
+        (-1, 1, ),
         (-1, -1, ),
     )
 
@@ -42,11 +43,11 @@ class GameMap(object):
 
     @property
     def rows(self):
-        return self.size[1]
+        return self.size[0]
 
     @property
     def cols(self):
-        return self.size[0]
+        return self.size[1]
 
     def reset(self, possibility_live=0.5, possibility_wall=0.1):
         """Reset the map with random data.
@@ -57,12 +58,18 @@ class GameMap(object):
         """
         for row in self.cells:
             for col_num in range(self.cols):
-                row[col_num] = 1 if random.random() < possibility_live else 0
+                if random.random() < possibility_wall:
+                    row[col_num] = -1
+                else:
+                    if random.random() < possibility_live:
+                        row[col_num] = 1
+                    else:
+                        row[col_num] = 0
 
     def set(self, row, col, val):
         """Set specific cell in the map."""
         assert self.MIN_CELL_VALUE <= val <= self.MAX_CELL_VALUE
-        self.cells[col][row] = val
+        self.cells[row][col] = val
         return self
 
     def get_neighbor_count(self, row, col):
@@ -83,7 +90,7 @@ class GameMap(object):
                 d_row -= self.rows
             if d_col >= self.cols:
                 d_col -= self.cols
-            count += self.cells[d_col][d_row]
+            count += self.cells[d_row][d_col]
         return count
 
     def get_neighbor_count_map(self):
